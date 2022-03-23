@@ -9,7 +9,7 @@ setup(
     desription='FastApi app',
     install_requires=[
         'fastapi==0.75.0',
-        'unicorn==1.0.3',
+        'uvicorn==0.17.6',
         'SQLAlchemy==1.4.32',
         'pytest==7.1.1',
         'requests==2.27.1'

@@ -15,7 +15,7 @@ class StreamStatus(Enum):
 
 
 def conn_db():
-    engine = create_engine(DATABASE_URL, connect_args={})
+    engine = create_engine(DATABASE_URL, connect_args={'check_same_thread': False})
     session = Session(bind=engine.connect())
     return session
 
@@ -31,6 +31,18 @@ class User(Base):
     login = Column(String)
     created_at = Column(String, default=datetime.utcnow())
 
+    def __str__(self):
+        return f'[{self.id}]{self.email}'
+
+    def get_filtered_data(self):
+        return {
+            'email': self.email,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'login': self.login,
+            'created_at': self.created_at
+        }
+
 
 class Stream(Base):
     __tablename__ = 'stream'
@@ -40,6 +52,9 @@ class Stream(Base):
     topic = Column(String)
     status = Column(String, default=StreamStatus.PLANED.value)
     created_at = Column(String, default=datetime.utcnow())
+
+    def __str__(self):
+        return f'{self.id} - {self.title}[{self.topic}]'
 
 
 class AuthToken(Base):

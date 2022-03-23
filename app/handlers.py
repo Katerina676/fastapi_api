@@ -1,6 +1,6 @@
 import uuid
-from datetime import datetime
 
+from app.auth import check_token
 from starlette import status
 from fastapi import APIRouter, Body, Depends, HTTPException
 from app.forms import UserLoginForm, UserCreateForm
@@ -20,7 +20,7 @@ def login(user_form: UserLoginForm = Body(..., embed=True), database=Depends(con
     database.add(token)
     database.commit()
 
-    return {'status': 'OK'}
+    return {'token': token.token}
 
 
 @router.post('/user', name='user:create')
@@ -38,3 +38,9 @@ def create_user(user: UserCreateForm = Body(..., embed=True), database=Depends(c
     database.add(new_user)
     database.commit()
     return {'user_id': new_user.id}
+
+
+@router.get('/user', name='user:get')
+def get_user(token: AuthToken = Depends(check_token), database=Depends(conn_db)):
+    user = database.query(User).filter(User.id == token.user_id).one_or_none()
+    return {'user': user.get_filtered_data()}
